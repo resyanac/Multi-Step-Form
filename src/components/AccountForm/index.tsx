@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button, Form, Input } from 'antd';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
@@ -8,9 +9,13 @@ const layout = {
 };
 
 const initialValues = {
-  username: '',
-  password: '',
+  username: 'user',
+  password: 'Helloworld1!'
 };
+
+interface AccountWrapper {
+  onPrev: () => void;
+}
 
 const validationSchema = yup.object({
   username: yup.string().required('Username is required'),
@@ -24,7 +29,7 @@ const validationSchema = yup.object({
     ),
 });
 
-const AccountForm: React.FC = () => {
+const AccountForm: React.FC<AccountWrapper> = ({ onPrev }) => {
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: validationSchema,
@@ -33,20 +38,30 @@ const AccountForm: React.FC = () => {
     },
   });
 
+  const submit = () => {
+    formik.handleSubmit();
+  };
+
   return (
-    <Form {...layout} onFinish={formik.handleSubmit}
-    style={{ maxWidth: 600, padding: '3rem', borderRadius: '9999px'}}>
+    <Form
+      {...layout}
+      onFinish={formik.handleSubmit}
+      style={{ maxWidth: 600, padding: '3rem', borderRadius: '9999px' }}
+    >
       <Form.Item
         name="username"
         label="Username"
         rules={[{ required: true, message: 'Username is required' }]}
+        hasFeedback 
+        validateStatus={formik.touched.username && formik.errors.username ? 'error' : ''}
+        help={formik.touched.username && formik.errors.username}
       >
         <Input
           name="username"
           value={formik.values.username}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          status={formik.errors.username && 'error'}
+          status={formik.errors.username ? 'error' : undefined} 
         />
       </Form.Item>
 
@@ -57,18 +72,24 @@ const AccountForm: React.FC = () => {
           { required: true, message: 'Password is required' },
           { min: 8, message: 'Password must be at least 8 characters' },
         ]}
+        hasFeedback 
+        validateStatus={formik.touched.password && formik.errors.password ? 'error' : ''}
+        help={formik.touched.password && formik.errors.password}
       >
         <Input.Password
           name="password"
           value={formik.values.password}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          status={formik.errors.password && 'error'}
+          status={formik.errors.password ? 'error' : undefined} 
         />
       </Form.Item>
 
       <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
-        <Button type="primary" htmlType="submit">
+        <Button htmlType="submit" onClick={onPrev} style={{ margin: '12px' }}>
+          Previous
+        </Button>
+        <Button type="primary" htmlType="submit" onClick={submit} style={{ margin: '12px' }}>
           Submit
         </Button>
       </Form.Item>
